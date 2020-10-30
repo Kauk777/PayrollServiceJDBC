@@ -52,22 +52,21 @@ public class EmployeePayrollDBService {
 		return employeePayrollList;
 	}
 
-	public int updateEmployeeData(String name, double salary) {
+	public int updateEmployeeData(String name, double salary) throws EmployeePayrollDataException {
 		return this.updateEmployeeDataUSingStatement(name, salary);
 	}
 
-	private int updateEmployeeDataUSingStatement(String name, double salary) {
+	private int updateEmployeeDataUSingStatement(String name, double salary) throws EmployeePayrollDataException {
 		String sql = String.format("UPDATE employee_payroll SET salary=%.2f WHERE name='%s';", salary, name);
 		try (Connection connection = this.getConnection()) {
 			Statement statement = connection.createStatement();
 			return statement.executeUpdate(sql);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
-		return 0;
 	}
 
-	public List<EmployeePayrollData> getEmployeePayrollData(String name) {
+	public List<EmployeePayrollData> getEmployeePayrollData(String name) throws EmployeePayrollDataException {
 		List<EmployeePayrollData> employeePayrollList = null;
 		if (this.employeePayrollDataStatement == null)
 			this.prepareStatementForEmployeeData();
@@ -76,7 +75,7 @@ public class EmployeePayrollDBService {
 			ResultSet result = employeePayrollDataStatement.executeQuery();
 			employeePayrollList = this.getEmployeePayrollData(result);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 		return employeePayrollList;
 	}

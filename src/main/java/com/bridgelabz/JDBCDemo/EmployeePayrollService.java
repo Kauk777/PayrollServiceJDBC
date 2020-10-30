@@ -46,7 +46,7 @@ public class EmployeePayrollService {
 		return this.employeePayrollList;
 	}
 
-	public void updateEmployeeSalary(String name, double salary) {
+	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
 			return;
@@ -62,7 +62,7 @@ public class EmployeePayrollService {
 				.orElse(null);
 	}
 
-	public boolean checkEmployeePayrollSyncWithDB(String name) {
+	public boolean checkEmployeePayrollSyncWithDB(String name) throws EmployeePayrollDataException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollDBService.getEmployeePayrollData(name);
 		return employeePayrollList.get(0).equals(getEmployeePayrollData(name));
 	}
