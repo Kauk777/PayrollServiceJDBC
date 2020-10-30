@@ -24,15 +24,9 @@ public class EmployeePayrollServiceTest
 		Assert.assertEquals(3, entries);
 	}
 	
-	/*@Test
-	public void givenFileOnReadingFormatFileShouldMatchEmployeeCount() {
-		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
-		long entries= employeePayrollService.readEmployeePayrollFileData(IOService.FILE_IO);
-		Assert.assertEquals(3, entries);
-	}*/
 	
 	@Test
-	public void givenEmployeePayrollsWhenRetrievedInDBShouldMatchEmployeeCount() {
+	public void givenEmployeePayrollsWhenRetrievedInDBShouldMatchEmployeeCount() throws EmployeePayrollDataException {
 		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData=employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		Assert.assertEquals(3, employeePayrollData.size());
@@ -40,7 +34,7 @@ public class EmployeePayrollServiceTest
 	}
 	
 	@Test
-	public void givenNewSalaryForEmployeeWhenUpdatedShouldMatch() {
+	public void givenNewSalaryForEmployeeWhenUpdatedShouldMatch() throws EmployeePayrollDataException {
 		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData=employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		employeePayrollService.updateEmployeeSalary("Nadia",3000000.00);

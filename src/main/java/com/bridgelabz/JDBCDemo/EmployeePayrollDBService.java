@@ -1,7 +1,6 @@
 package com.bridgelabz.JDBCDemo;
 
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 public class EmployeePayrollDBService {
@@ -26,32 +24,6 @@ public class EmployeePayrollDBService {
 		return employeePayrollDBService;
 	}
 
-	public static void main(String[] args) {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			System.out.println("Driver loaded");
-		} catch (ClassNotFoundException e) {
-			System.out.println("Driver not found");
-			e.printStackTrace();
-		}
-
-		listDrivers();
-		try {
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void listDrivers() {
-		Enumeration<Driver> driverList = DriverManager.getDrivers();
-		while (driverList.hasMoreElements()) {
-			Driver driverClass = (Driver) driverList.nextElement();
-			System.out.println(" " + driverClass.getClass().getName());
-		}
-
-	}
-
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String user = "root";
@@ -65,7 +37,7 @@ public class EmployeePayrollDBService {
 		return connection;
 	}
 
-	public List<EmployeePayrollData> readData() {
+	public List<EmployeePayrollData> readData() throws EmployeePayrollDataException {
 		String sql = "SELECT * FROM employee_payroll;";
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		try (Connection connection = this.getConnection()) {
@@ -75,7 +47,7 @@ public class EmployeePayrollDBService {
 			employeePayrollList = this.getEmployeePayrollData(result);
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 		return employeePayrollList;
 	}
