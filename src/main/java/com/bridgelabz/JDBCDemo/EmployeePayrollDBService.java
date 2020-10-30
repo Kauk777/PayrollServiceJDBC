@@ -65,6 +65,22 @@ public class EmployeePayrollDBService {
 		}
 		return employeePayrollList;
 	}
+	
+	public int readTotalSalary(String gender) throws EmployeePayrollDataException {
+		String sql="select gender,sum(salary) from employee_payroll group by gender;";
+		int totalSalary=0;
+		try (Connection connection = this.getConnection()) {
+			PreparedStatement prepareStatement=connection.prepareStatement(sql);
+			ResultSet result=prepareStatement.executeQuery();
+			while(result.next()) {
+				if(result.getString(1).equalsIgnoreCase(gender))
+					totalSalary=result.getInt(2);
+			}
+		} catch (SQLException e) {
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+		}
+		return totalSalary;
+	}
 
 	public int updateEmployeeData(String name, double salary) throws EmployeePayrollDataException {
 		return this.updateEmployeeDataUSingStatement(name, salary);
@@ -120,5 +136,7 @@ public class EmployeePayrollDBService {
 			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 	}
+
+	
 
 }

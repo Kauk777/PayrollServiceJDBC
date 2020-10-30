@@ -49,5 +49,22 @@ public class EmployeePayrollServiceTest
 		Assert.assertEquals(2, employeePayrollData.size());
 		
 	}
+	 
+	@Test
+	public void givenEmployeePayrollsWhenTotalSalaryByMaleGenderRetrievedShouldMatchSalary() throws EmployeePayrollDataException {
+		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
+		int totalSalary=employeePayrollService.readTotalSalary(IOService.DB_IO,"M");
+		Assert.assertEquals(9400000, totalSalary);
+		
+	}
+	
+	@Test
+	public void givenEmployeePayrollsWhenTotalSalaryByFemaleGenderRetrievedShouldMatchSalary() throws EmployeePayrollDataException {
+		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
+		int totalSalary=employeePayrollService.readTotalSalary(IOService.DB_IO,"F");
+		Assert.assertEquals(3000000, totalSalary);
+		
+	}
+	
 
 }

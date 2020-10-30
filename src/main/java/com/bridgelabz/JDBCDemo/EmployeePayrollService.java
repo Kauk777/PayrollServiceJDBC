@@ -51,6 +51,13 @@ public class EmployeePayrollService {
 			this.employeePayrollList = employeePayrollDBService.readDataByDate(startDate);
 		return this.employeePayrollList;
 	}
+	
+	public int readTotalSalary(IOService ioService, String gender) throws EmployeePayrollDataException {
+		int totalSalary=0;
+		if (ioService.equals(IOService.DB_IO))
+			totalSalary=employeePayrollDBService.readTotalSalary(gender);
+		return totalSalary;
+	}
 
 	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
@@ -94,5 +101,7 @@ public class EmployeePayrollService {
 			entries = new EmployeePayrollFileIOService().countEntries();
 		return entries;
 	}
+
+	
 
 }
