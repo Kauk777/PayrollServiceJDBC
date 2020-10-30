@@ -45,6 +45,12 @@ public class EmployeePayrollService {
 			this.employeePayrollList = employeePayrollDBService.readData();
 		return this.employeePayrollList;
 	}
+	
+	public List<EmployeePayrollData> readEmployeePayrollDataByDate(IOService ioService, String startDate) throws EmployeePayrollDataException {
+		if (ioService.equals(IOService.DB_IO))
+			this.employeePayrollList = employeePayrollDBService.readDataByDate(startDate);
+		return this.employeePayrollList;
+	}
 
 	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
@@ -58,7 +64,8 @@ public class EmployeePayrollService {
 
 	private EmployeePayrollData getEmployeePayrollData(String name) {
 		return this.employeePayrollList.stream()
-				.filter(employeePayrollDataItem -> employeePayrollDataItem.employeeName.equals(name)).findFirst()
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.employeeName.equals(name))
+				.findFirst()
 				.orElse(null);
 	}
 

@@ -51,6 +51,20 @@ public class EmployeePayrollDBService {
 		}
 		return employeePayrollList;
 	}
+	
+	public List<EmployeePayrollData> readDataByDate(String startDate) throws EmployeePayrollDataException {
+		String sql="select * from employee_payroll where start between cast(? as date) and date(now());";
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+		try (Connection connection = this.getConnection()) {
+			PreparedStatement prepareStatement=connection.prepareStatement(sql);
+			prepareStatement.setString(1, startDate);
+			ResultSet result=prepareStatement.executeQuery();
+			employeePayrollList = this.getEmployeePayrollData(result);
+		} catch (SQLException e) {
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+		}
+		return employeePayrollList;
+	}
 
 	public int updateEmployeeData(String name, double salary) throws EmployeePayrollDataException {
 		return this.updateEmployeeDataUSingStatement(name, salary);
