@@ -80,7 +80,7 @@ public class EmployeePayrollDBService {
 		return employeePayrollList;
 	}
 
-	private List<EmployeePayrollData> getEmployeePayrollData(ResultSet result) {
+	private List<EmployeePayrollData> getEmployeePayrollData(ResultSet result) throws EmployeePayrollDataException {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		try {
 			while (result.next()) {
@@ -91,19 +91,19 @@ public class EmployeePayrollDBService {
 				employeePayrollList.add(new EmployeePayrollData(id, name, salary, start));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 
 		return employeePayrollList;
 	}
 
-	private void prepareStatementForEmployeeData() {
+	private void prepareStatementForEmployeeData() throws EmployeePayrollDataException {
 		try {
 			Connection connection = this.getConnection();
 			String sql = "SELECT * FROM employee_payroll WHERE name=? ";
 			employeePayrollDataStatement = connection.prepareStatement(sql);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 	}
 

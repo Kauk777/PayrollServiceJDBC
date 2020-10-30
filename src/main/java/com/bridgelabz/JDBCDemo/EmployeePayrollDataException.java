@@ -4,7 +4,7 @@ package com.bridgelabz.JDBCDemo;
 public class EmployeePayrollDataException extends Exception {
 
 	enum ExceptionType {
-		EMPLOYEEPAYROLL_DB_PROBLEM, UNABLE_TO_CONNECT
+		EMPLOYEEPAYROLL_DB_PROBLEM, UNABLE_TO_UPDATE
 	}
 
 	ExceptionType type;

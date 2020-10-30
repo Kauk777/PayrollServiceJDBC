@@ -49,7 +49,7 @@ public class EmployeePayrollService {
 	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
-			return;
+			throw new EmployeePayrollDataException("No Updation Performed",EmployeePayrollDataException.ExceptionType.UNABLE_TO_UPDATE);
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
 		if (employeePayrollData != null)
 			employeePayrollData.employeeSalary = salary;
