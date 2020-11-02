@@ -1,5 +1,6 @@
 package com.bridgelabz.JDBCDemo;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +72,8 @@ public class EmployeePayrollServiceTest
 	public void givenEmployeeDBWhenAddedShouldSyncWithDB() throws EmployeePayrollDataException {
 		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		employeePayrollService.addEmployeePayrollData("Mark",5000000.00,LocalDate.now(),"M");
+		String[] departments= {"IT","Marketing"};
+		employeePayrollService.addEmployeePayrollData("Mark",5000000.00,LocalDate.now(),"M",702,departments,"CISCO");
 		boolean result=employeePayrollService.checkEmployeePayrollSyncWithDB("Mark");
 		Assert.assertTrue(result);
 		

@@ -1,5 +1,6 @@
 package com.bridgelabz.JDBCDemo;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -150,7 +151,7 @@ public class EmployeePayrollDBService {
 		}
 	}
 
-	public EmployeePayrollData addEmployeePayrollUC7(String name, double salary, LocalDate startDate, String gender)
+	/*public EmployeePayrollData addEmployeePayrollUC7(String name, double salary, LocalDate startDate, String gender)
 			throws EmployeePayrollDataException {
 		int employeeId = -1;
 		EmployeePayrollData employeePayrollData = null;
@@ -171,23 +172,30 @@ public class EmployeePayrollDBService {
 					EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 		return employeePayrollData;
-	}
+	}*/
 
-	public EmployeePayrollData addEmployeePayroll(String name, double salary, LocalDate startDate, String gender)
+	public EmployeePayrollData addEmployeePayroll(String name, double salary, LocalDate startDate, String gender, int companyID, String[] department, String companyName)
 			throws EmployeePayrollDataException {
 		int employeeId = -1;
 		Connection connection = null;
 		EmployeePayrollData employeePayrollData = null;
 		try {
 			connection = this.getConnection();
+			connection.setAutoCommit(false);
 		} catch (SQLException e) {
 			throw new EmployeePayrollDataException(e.getMessage(),
 					EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
-		try (Statement statement = connection.createStatement()) {
-			String sql = String.format(
-					"INSERT INTO employee_payroll (name,salary,start,gender) " + "VALUES ('%s', %s, '%s','%s')", name,
-					salary, Date.valueOf(startDate), gender);
+		try  {
+			String sql ="INSERT INTO employee_payroll (name,salary,start,gender,companyID,department) " + "VALUES (?,?, ?,?,?,?);";
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, name);
+			statement.setDouble(2, salary);
+			statement.setDate(3, Date.valueOf(startDate));
+			statement.setString(4, gender);
+			statement.setInt(5, companyID);
+			Array array = connection.createArrayOf("VARCHAR", department);
+			statement.setArray(6, array);
 			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
 			if (rowAffected == 1) {
 				ResultSet result = statement.getGeneratedKeys();
@@ -196,8 +204,13 @@ public class EmployeePayrollDBService {
 			}
 
 		} catch (SQLException e) {
-			throw new EmployeePayrollDataException(e.getMessage(),
-					EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		try (Statement statement = connection.createStatement()) {
@@ -213,11 +226,75 @@ public class EmployeePayrollDBService {
 				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, startDate);
 
 		} catch (SQLException e) {
-			throw new EmployeePayrollDataException(e.getMessage(),
-					EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+
+		}
+		
+		try (Statement statement = connection.createStatement()) {
+			int deptId=0;
+			int rowsAffected=0;
+			for(String dept:department) {
+				if(dept.equalsIgnoreCase("Sales"))
+					deptId=101;
+				if(dept.equalsIgnoreCase("Marketing"))
+					deptId=102;
+				if(dept.equalsIgnoreCase("IT"))
+					deptId=103;
+				if(dept.equalsIgnoreCase("HR"))
+					deptId=104;
+			String sql=String.format("INSERT INTO employee_department "+ "(dept_id,dept_name,emp_id) VALUES "+ "(%s,'%s',%s) ", deptId, dept, employeeId);
+			rowsAffected = rowsAffected + statement.executeUpdate(sql);
+			}
+			
+			if(rowsAffected==department.length)
+				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, startDate);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+
+		}
+		
+		try (Statement statement = connection.createStatement()) {
+			String sql=String.format("INSERT INTO employee_company "+ "(companyID,companyName) VALUES "+ "(%s,'%s') ", companyID, companyName);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 1)
+				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, startDate);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 		}
 
+
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return employeePayrollData;
 	}
-
+	
 }

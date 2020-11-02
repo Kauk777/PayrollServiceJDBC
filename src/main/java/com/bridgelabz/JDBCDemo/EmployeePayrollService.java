@@ -1,5 +1,6 @@
 package com.bridgelabz.JDBCDemo;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -70,8 +71,8 @@ public class EmployeePayrollService {
 
 	}
 	
-    public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollDataException {
-		employeePayrollList.add(employeePayrollDBService.addEmployeePayroll(name,salary,startDate,gender));
+    public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender, int companyId, String[] department, String companyName) throws EmployeePayrollDataException {
+		employeePayrollList.add(employeePayrollDBService.addEmployeePayroll(name,salary,startDate,gender,companyId,department,companyName));
 		
 	}
 
