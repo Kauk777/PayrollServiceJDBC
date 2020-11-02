@@ -139,7 +139,6 @@ public class EmployeePayrollDBService {
 
 		return employeePayrollList;
 	}
-
 	private void prepareStatementForEmployeeData() throws EmployeePayrollDataException {
 		try {
 			Connection connection = this.getConnection();
