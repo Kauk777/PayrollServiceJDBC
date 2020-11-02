@@ -1,5 +1,6 @@
 package com.bridgelabz.JDBCDemo;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,6 +64,16 @@ public class EmployeePayrollServiceTest
 		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
 		int totalSalary=employeePayrollService.readTotalSalary(IOService.DB_IO,"F");
 		Assert.assertEquals(3000000, totalSalary);
+		
+	}
+	
+	@Test
+	public void givenEmployeeDBWhenAddedShouldSyncWithDB() throws EmployeePayrollDataException {
+		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.addEmployeePayrollData("Mark",5000000.00,LocalDate.now(),"M");
+		boolean result=employeePayrollService.checkEmployeePayrollSyncWithDB("Mark");
+		Assert.assertTrue(result);
 		
 	}
 	

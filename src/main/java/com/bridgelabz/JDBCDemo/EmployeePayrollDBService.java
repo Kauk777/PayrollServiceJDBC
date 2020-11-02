@@ -1,6 +1,7 @@
 package com.bridgelabz.JDBCDemo;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,6 +40,10 @@ public class EmployeePayrollDBService {
 
 	public List<EmployeePayrollData> readData() throws EmployeePayrollDataException {
 		String sql = "SELECT * FROM employee_payroll;";
+		return this.getReadQueryData(sql);
+	}
+	
+	private List<EmployeePayrollData> getReadQueryData(String sql) throws EmployeePayrollDataException {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		try (Connection connection = this.getConnection()) {
 
@@ -50,6 +55,7 @@ public class EmployeePayrollDBService {
 			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
 		return employeePayrollList;
+		
 	}
 	
 	public List<EmployeePayrollData> readDataByDate(String startDate) throws EmployeePayrollDataException {
@@ -135,6 +141,64 @@ public class EmployeePayrollDBService {
 		} catch (SQLException e) {
 			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
 		}
+	}
+
+	public EmployeePayrollData addEmployeePayrollUC7(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollDataException {
+		int employeeId=-1;
+		EmployeePayrollData employeePayrollData=null;
+		String sql=String.format("INSERT INTO employee_payroll (name,salary,start,gender) "+"VALUES ('%s', %s, '%s','%s')", name, salary, Date.valueOf(startDate), gender);
+		try(Connection connection=this.getConnection()) {
+			Statement statement = connection.createStatement();
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if(rowAffected==1) {
+				ResultSet result=statement.getGeneratedKeys();
+				if(result.next())
+					employeeId=result.getInt(1);
+			}
+			employeePayrollData=new EmployeePayrollData(employeeId,name,salary,startDate);
+		} catch (SQLException e) {
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+		}
+		return employeePayrollData;
+	}
+
+	public EmployeePayrollData addEmployeePayroll(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollDataException {
+		int employeeId=-1;
+		Connection connection=null;
+		EmployeePayrollData employeePayrollData=null;
+		try {
+			connection=this.getConnection();
+		} catch (SQLException e) {
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+		}
+		try (Statement statement = connection.createStatement()) {
+			String sql=String.format("INSERT INTO employee_payroll (name,salary,start,gender) "+"VALUES ('%s', %s, '%s','%s')", name, salary, Date.valueOf(startDate), gender);
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if(rowAffected==1) {
+				ResultSet result=statement.getGeneratedKeys();
+				if(result.next())
+					employeeId=result.getInt(1);
+			}
+			
+		} catch (SQLException e) {
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+		}
+		
+		try(Statement statement = connection.createStatement()) {
+			double deductions=salary*0.2;
+			double taxablePay=salary-deductions;
+			double tax=taxablePay*0.1;
+			double netPay=salary-tax;
+			String sql=String.format("INSERT INTO payroll_details "+"(employee_id,basic_pay,deductions,taxable_pay,tax,net_pay) VALUES "+"(%s,%s,%s,%s,%s,%s)",employeeId,salary,deductions,taxablePay,tax,netPay);
+			int rowAffected = statement.executeUpdate(sql);
+			if(rowAffected==1)
+				employeePayrollData=new EmployeePayrollData(employeeId,name,salary,startDate);
+			
+		} catch (SQLException e) {
+			throw new EmployeePayrollDataException(e.getMessage(),EmployeePayrollDataException.ExceptionType.EMPLOYEEPAYROLL_DB_PROBLEM);
+		}
+		
+		return employeePayrollData;
 	}
 
 	

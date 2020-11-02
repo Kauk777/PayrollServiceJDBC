@@ -1,5 +1,6 @@
 package com.bridgelabz.JDBCDemo;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -68,6 +69,12 @@ public class EmployeePayrollService {
 			employeePayrollData.employeeSalary = salary;
 
 	}
+	
+    public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollDataException {
+		employeePayrollList.add(employeePayrollDBService.addEmployeePayroll(name,salary,startDate,gender));
+		
+	}
+
 
 	private EmployeePayrollData getEmployeePayrollData(String name) {
 		return this.employeePayrollList.stream()
@@ -102,6 +109,7 @@ public class EmployeePayrollService {
 		return entries;
 	}
 
+	
 	
 
 }
