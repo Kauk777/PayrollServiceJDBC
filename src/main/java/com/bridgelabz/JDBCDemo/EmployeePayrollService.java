@@ -50,8 +50,8 @@ public class EmployeePayrollService {
 	
 	public List<EmployeePayrollData> readEmployeePayrollDataByDate(IOService ioService, String startDate) throws EmployeePayrollDataException {
 		if (ioService.equals(IOService.DB_IO))
-			this.employeePayrollList = employeePayrollDBService.readDataByDate(startDate);
-		return this.employeePayrollList;
+			employeePayrollList= employeePayrollDBService.readDataByDate(startDate);
+		return employeePayrollList;
 	}
 	
 	public int readTotalSalary(IOService ioService, String gender) throws EmployeePayrollDataException {
@@ -71,9 +71,22 @@ public class EmployeePayrollService {
 
 	}
 	
-    public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender, int companyId, String[] department, String companyName) throws EmployeePayrollDataException {
-		employeePayrollList.add(employeePayrollDBService.addEmployeePayrollData(name,salary,startDate,gender,companyId,department,companyName));
+    public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollDataException {
+		employeePayrollList.add(employeePayrollDBService.addEmployeePayrollData(name,salary,startDate,gender));
 		
+	}
+    
+    public void addEmployeesPayrollData(List<EmployeePayrollData> empList) {
+		empList.forEach(empData -> {
+			//System.out.println("Employee Being Added: "+empData.employeeName);
+				try {
+					this.addEmployeePayrollData(empData.employeeName, empData.employeeSalary, empData.start, empData.gender);
+				} catch (EmployeePayrollDataException e) {
+					e.printStackTrace();
+				}
+			//System.out.println("Employee added: "+empData.employeeName);
+		});
+		//System.out.println(this.employeePayrollList);
 	}
 
 
@@ -104,13 +117,14 @@ public class EmployeePayrollService {
 	}
 
 	public long countEntries(IOService ioService) {
-		long entries = 0;
 		if (ioService.equals(IOService.FILE_IO))
-			entries = new EmployeePayrollFileIOService().countEntries();
-		return entries;
+			return new EmployeePayrollFileIOService().countEntries();
+		return employeePayrollList.size();
 	}
 
-	
-	
+	public void addEmployeesPayrollDataWithThreads(List<EmployeePayrollData> empList) {
+		
+		
+	}
 
 }
