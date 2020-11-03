@@ -2,6 +2,7 @@ package com.bridgelabz.JDBCDemo;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class EmployeePayrollData {
 	private int employeeId;
@@ -39,8 +40,12 @@ public class EmployeePayrollData {
 	@Override
 	public String toString() {
 		return "EmployeePayrollData [employeeId=" + employeeId + ", employeeName=" + employeeName + ", employeeSalary="
-				+ employeeSalary + ", start=" + start + ", companyID=" + companyID + ", department="
-				+ Arrays.toString(department) + "]";
+				+ employeeSalary + "]";
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(employeeName,employeeSalary,gender, start);
 	}
 
 	@Override
