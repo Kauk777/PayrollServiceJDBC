@@ -64,7 +64,7 @@ public class EmployeePayrollService {
 		return totalSalary;
 	}
 
-	public int updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
+	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
 			throw new EmployeePayrollDataException("No Updation Performed",
@@ -72,7 +72,6 @@ public class EmployeePayrollService {
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
 		if (employeePayrollData != null)
 			employeePayrollData.employeeSalary = salary;
-		return result;
 
 	}
 	
