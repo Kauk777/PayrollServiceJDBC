@@ -50,7 +50,7 @@ public class EmployeePayrollServiceTest
 	public void givenEmployeePayrollsWhenRetrievedInDateRangeDBShouldMatchEmployeeCount() throws EmployeePayrollDataException {
 		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData=employeePayrollService.readEmployeePayrollDataByDate(IOService.DB_IO,"2018-07-10");
-		Assert.assertEquals(7, employeePayrollData.size());
+		Assert.assertEquals(12, employeePayrollData.size());
 		
 	}
 	 
