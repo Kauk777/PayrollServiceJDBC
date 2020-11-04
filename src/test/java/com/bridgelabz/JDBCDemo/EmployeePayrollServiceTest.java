@@ -38,15 +38,6 @@ public class EmployeePayrollServiceTest
 	}
 	
 	@Test
-	public void givenNewSalaryForEmployeeWhenUpdatedShouldMatch() throws EmployeePayrollDataException {
-		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
-		List<EmployeePayrollData> employeePayrollData=employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		employeePayrollService.updateEmployeeSalary("Nadia",3000000.00);
-		boolean result=employeePayrollService.checkEmployeePayrollSyncWithDB("Nadia");
-		Assert.assertTrue(result);
-	}
-	
-	@Test
 	public void givenEmployeePayrollsWhenRetrievedInDateRangeDBShouldMatchEmployeeCount() throws EmployeePayrollDataException {
 		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData=employeePayrollService.readEmployeePayrollDataByDate(IOService.DB_IO,"2018-07-10");
@@ -97,9 +88,25 @@ public class EmployeePayrollServiceTest
 		Instant threadStart=Instant.now();
 		employeePayrollService.addEmployeesPayrollDataWithThreads(Arrays.asList(empArrays));
 		Instant threadEnd=Instant.now();
-		System.out.println("Duration with thread "+Duration.between(start,end));
+		System.out.println("Duration with thread "+Duration.between(threadStart,threadEnd));
 		employeePayrollService.printData(IOService.DB_IO);
 		Assert.assertEquals(13 , employeePayrollService.countEntries(IOService.DB_IO));
+	}
+	
+	@Test
+	public void givenNewSalaryForEmployeeWhenUpdatedShouldMatch() throws EmployeePayrollDataException {
+		EmployeePayrollData[] empArrays= { new EmployeePayrollData("Alicia",970000.0),
+				   new EmployeePayrollData("Greg",860000.0),
+				   new EmployeePayrollData("Ester",770000.0) };
+			
+		EmployeePayrollService employeePayrollService=new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		Instant threadStart=Instant.now();
+		employeePayrollService.updateEmployeeSalariesWithThread(Arrays.asList(empArrays));
+		Instant threadEnd=Instant.now();
+		System.out.println("Duration with thread "+Duration.between(threadStart,threadEnd));
+		boolean result=employeePayrollService.checkEmployeePayrollSyncWithDB("Ester");
+		Assert.assertTrue(result);
 	}
 		
 		

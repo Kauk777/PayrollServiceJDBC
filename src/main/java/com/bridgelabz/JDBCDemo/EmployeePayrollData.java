@@ -37,6 +37,11 @@ public class EmployeePayrollData {
 		this.department = department;
 	}
 
+	public EmployeePayrollData(String name, double salary) {
+		this.employeeName=name;
+		this.employeeSalary=salary;
+	}
+
 	@Override
 	public String toString() {
 		return "EmployeePayrollData [employeeId=" + employeeId + ", employeeName=" + employeeName + ", employeeSalary="

@@ -64,7 +64,7 @@ public class EmployeePayrollService {
 		return totalSalary;
 	}
 
-	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
+	public int updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
 			throw new EmployeePayrollDataException("No Updation Performed",
@@ -72,7 +72,37 @@ public class EmployeePayrollService {
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
 		if (employeePayrollData != null)
 			employeePayrollData.employeeSalary = salary;
+		return result;
 
+	}
+	
+	public void updateEmployeeSalariesWithThread(List<EmployeePayrollData> empList) {
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<>();
+		empList.forEach( empData-> { 
+			Runnable task = () -> { 
+				try {
+					employeeAdditionStatus.put(empData.hashCode(), false);
+					System.out.println("Employee being updated: " + Thread.currentThread().getName());
+					this.updateEmployeeSalary(empData.employeeName, empData.employeeSalary);
+				    employeeAdditionStatus.put(empData.hashCode(), true);
+				    System.out.println("Employee updated: " + Thread.currentThread().getName());
+				} catch (EmployeePayrollDataException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			};
+			Thread thread = new Thread(task, empData.employeeName);
+			thread.start();
+			
+		});
+		while (employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+				
 	}
 
 	public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender)
@@ -157,5 +187,7 @@ public class EmployeePayrollService {
 			return new EmployeePayrollFileIOService().countEntries();
 		return employeePayrollList.size();
 	}
+
+	
 
 }
