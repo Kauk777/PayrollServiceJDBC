@@ -5,52 +5,49 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class EmployeePayrollData {
-	private int employeeId;
-	public String employeeName;
-	public double employeeSalary;
+	public int id;
+	public String name;
 	public String gender;
-	public LocalDate start;
-	private int companyID;
-	private String[] department;
+	public double salary;
+	public LocalDate startDate;
 
 	public EmployeePayrollData(int employeeId, String employeeName, double employeeSalary) {
-		this.employeeId = employeeId;
-		this.employeeName = employeeName;
-		this.employeeSalary = employeeSalary;
+		this.id = employeeId;
+		this.name = employeeName;
+		this.salary = employeeSalary;
 	}
 
 	public EmployeePayrollData(int employeeId, String employeeName, double employeeSalary, LocalDate start) {
 		this(employeeId, employeeName, employeeSalary);
-		this.start = start;
+		this.startDate = start;
 	}
 	
 	public EmployeePayrollData(int employeeId, String employeeName, String gender, double employeeSalary, LocalDate start) {
 		this(employeeId, employeeName, employeeSalary);
 		this.gender=gender;
-		this.start = start;
+		this.startDate = start;
 	}
 
-	public EmployeePayrollData(int employeeId, String employeeName, double employeeSalary, LocalDate start,
-			int companyID, String[] department) {
-		this(employeeId, employeeName, employeeSalary, start);
-		this.companyID = companyID;
-		this.department = department;
-	}
+	
 
 	public EmployeePayrollData(String name, double salary) {
-		this.employeeName=name;
-		this.employeeSalary=salary;
+		this.name=name;
+		this.salary=salary;
 	}
 
-	@Override
-	public String toString() {
-		return "EmployeePayrollData [employeeId=" + employeeId + ", employeeName=" + employeeName + ", employeeSalary="
-				+ employeeSalary + "]";
-	}
-	
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(employeeName,employeeSalary,gender, start);
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(salary);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
+		return result;
 	}
 
 	@Override
@@ -62,16 +59,36 @@ public class EmployeePayrollData {
 		if (getClass() != obj.getClass())
 			return false;
 		EmployeePayrollData other = (EmployeePayrollData) obj;
-		if (employeeId != other.employeeId)
+		if (Double.doubleToLongBits(salary) != Double.doubleToLongBits(other.salary))
 			return false;
-		if (employeeName == null) {
-			if (other.employeeName != null)
+		if (gender == null) {
+			if (other.gender != null)
 				return false;
-		} else if (!employeeName.equals(other.employeeName))
+		} else if (!gender.equals(other.gender))
 			return false;
-		if (Double.doubleToLongBits(employeeSalary) != Double.doubleToLongBits(other.employeeSalary))
+		if (id != other.id)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (startDate == null) {
+			if (other.startDate != null)
+				return false;
+		} else if (!startDate.equals(other.startDate))
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "EmployeePayrollData [id=" + id + ", name=" + name + ", gender=" + gender + ", salary=" + salary
+				+ ", start=" + startDate + "]";
+	}
+	
+	
+
+	
 
 }

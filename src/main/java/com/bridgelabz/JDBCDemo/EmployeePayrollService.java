@@ -2,6 +2,7 @@ package com.bridgelabz.JDBCDemo;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class EmployeePayrollService {
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this();
-		this.employeePayrollList = employeePayrollList;
+		this.employeePayrollList = new ArrayList<>(employeePayrollList);
 
 	}
 
@@ -64,16 +65,26 @@ public class EmployeePayrollService {
 		return totalSalary;
 	}
 
-	public void updateEmployeeSalary(String name, double salary) throws EmployeePayrollDataException {
+	public void updateEmployeeSalary(String name, double salary, IOService ioService) throws EmployeePayrollDataException {
+		if(ioService.equals(IOService.DB_IO)) {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
 			throw new EmployeePayrollDataException("No Updation Performed",
 					EmployeePayrollDataException.ExceptionType.UNABLE_TO_UPDATE);
+		}
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
 		if (employeePayrollData != null)
-			employeePayrollData.employeeSalary = salary;
+			employeePayrollData.salary = salary;
 
 	}
+	
+	public EmployeePayrollData getEmployeePayrollData(String name) {
+		return this.employeePayrollList.stream()
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
+				.findFirst()
+				.orElse(null);
+	}
+	
 	
 	public void updateEmployeeSalariesWithThread(List<EmployeePayrollData> empList) {
 		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<>();
@@ -82,7 +93,7 @@ public class EmployeePayrollService {
 				try {
 					employeeAdditionStatus.put(empData.hashCode(), false);
 					System.out.println("Employee being updated: " + Thread.currentThread().getName());
-					this.updateEmployeeSalary(empData.employeeName, empData.employeeSalary);
+					this.updateEmployeeSalary(empData.name, empData.salary, IOService.DB_IO);
 				    employeeAdditionStatus.put(empData.hashCode(), true);
 				    System.out.println("Employee updated: " + Thread.currentThread().getName());
 				} catch (EmployeePayrollDataException e) {
@@ -90,7 +101,7 @@ public class EmployeePayrollService {
 					e.printStackTrace();
 				}
 			};
-			Thread thread = new Thread(task, empData.employeeName);
+			Thread thread = new Thread(task, empData.name);
 			thread.start();
 			
 		});
@@ -103,6 +114,10 @@ public class EmployeePayrollService {
 		}
 				
 	}
+	
+	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData, IOService restIo) {
+		employeePayrollList.add(employeePayrollData);
+	}
 
 	public void addEmployeePayrollData(String name, double salary, LocalDate startDate, String gender)
 			throws EmployeePayrollDataException {
@@ -114,7 +129,7 @@ public class EmployeePayrollService {
 		empList.forEach(empData -> {
 			// System.out.println("Employee Being Added: "+empData.employeeName);
 			try {
-				this.addEmployeePayrollData(empData.employeeName, empData.employeeSalary, empData.start,
+				this.addEmployeePayrollData(empData.name, empData.salary, empData.startDate,
 						empData.gender);
 			} catch (EmployeePayrollDataException e) {
 				e.printStackTrace();
@@ -131,7 +146,7 @@ public class EmployeePayrollService {
 				try {
 					employeeAdditionStatus.put(empData.hashCode(), false);
 					System.out.println("Employee being added: " + Thread.currentThread().getName());
-					this.addEmployeePayrollData(empData.employeeName, empData.employeeSalary, empData.start,
+					this.addEmployeePayrollData(empData.name, empData.salary, empData.startDate,
 							empData.gender);
 					employeeAdditionStatus.put(empData.hashCode(), true);
 					System.out.println("Employee added: " + Thread.currentThread().getName());
@@ -139,7 +154,7 @@ public class EmployeePayrollService {
 					e.printStackTrace();
 				}
 			};
-			Thread thread = new Thread(task, empData.employeeName);
+			Thread thread = new Thread(task, empData.name);
 			thread.start();
 		});
 		while (employeeAdditionStatus.containsValue(false)) {
@@ -154,11 +169,7 @@ public class EmployeePayrollService {
 
 	}
 
-	private EmployeePayrollData getEmployeePayrollData(String name) {
-		return this.employeePayrollList.stream()
-				.filter(employeePayrollDataItem -> employeePayrollDataItem.employeeName.equals(name)).findFirst()
-				.orElse(null);
-	}
+	
 
 	public boolean checkEmployeePayrollSyncWithDB(String name) throws EmployeePayrollDataException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollDBService.getEmployeePayrollData(name);
@@ -186,6 +197,16 @@ public class EmployeePayrollService {
 			return new EmployeePayrollFileIOService().countEntries();
 		return employeePayrollList.size();
 	}
+
+	public void deleteEmployeePayroll(String name, IOService ioService) {
+		if (ioService.equals(IOService.REST_IO)) {
+			EmployeePayrollData employeePayrollData=this.getEmployeePayrollData(name);
+			employeePayrollList.remove(employeePayrollData);
+		}
+		
+	}
+
+	
 
 	
 
